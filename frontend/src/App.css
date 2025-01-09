@@ -1,0 +1,250 @@
+/* Global Styles */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+.App {
+  display: flex;
+  height: 100vh;
+  background-color: #ffffff;
+}
+
+/* Login Form Styles */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f4f4f4;
+}
+
+.login-form h2 {
+  margin-bottom: 20px;
+}
+
+.login-form input {
+  margin-bottom: 10px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.login-form button {
+  padding: 10px 15px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  background-color: #333;
+  color: white;
+  cursor: pointer;
+}
+
+.login-form button:hover {
+  background-color: #555;
+}
+
+.login-form p {
+  margin-top: 10px;
+  color: #333;
+}
+
+.login-form p span {
+  color: #007bff;
+  cursor: pointer;
+}
+
+.login-form p span:hover {
+  text-decoration: underline;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: 20%;
+  background-color: #f5f5f5;
+  color: #333;
+  padding: 2px;
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  /*border-right: 1px solid #dcdcdc;*/
+}
+
+.sidebar h2 {
+  margin-top: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: #444;
+}
+
+.chat-sessions-container {
+  flex-grow: 1;
+  max-height: calc(100vh);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  /* Adding some spacing between sessions */
+  padding-right: 0px;
+  /* Adding padding for better scroll visibility */
+}
+
+.chat-sessions-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-sessions-container::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 5px;
+}
+
+.chat-sessions-container::-webkit-scrollbar-thumb:hover {
+  background-color: #aaa;
+}
+
+.chat-sessions-container::-webkit-scrollbar-track {
+  background-color: #f5f5f5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.sidebar div {
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar div:hover {
+  background-color: #e8e8e8;
+}
+
+.sidebar div.active-session {
+  background-color: #e0e0e0;
+  font-weight: bold;
+}
+
+.sidebar span {
+  flex-grow: 1;
+  font-size: 14px;
+  color: #333;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar .delete-button {
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: auto;
+  transition: background-color 0.3s ease;
+  align-self: center;
+}
+
+.sidebar div:hover > .delete-button {
+  background-color: #555;
+}
+
+button {
+  background-color: #333;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin-top: 1px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  
+}
+
+button:hover {
+  background-color: #555;
+}
+
+/* Chat Window Styles */
+.chat-window {
+  width: 80%;
+  padding: 20px;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-window h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.messages-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Code Block Styles */
+.code-block {
+  background-color: #1e1e1e;
+  color: #c9d1d9;
+  font-family: 'Courier New', Courier, monospace;
+  padding: 10px;
+  border-radius: 5px;
+  overflow-x: auto;
+  white-space: pre;
+  max-height: 300px;
+  margin: 10px 0;
+  border: 1px solid #333;
+}
+
+/* Input Area Styles */
+.input-area {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+input[type="text"] {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border-color: #333;
+}
+
+button {
+  background-color: #000;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #333;
+}
