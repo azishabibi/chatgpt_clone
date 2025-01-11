@@ -87,6 +87,10 @@ async def chat(request: Request):
         repetition_penalty=1.2,
         no_repeat_ngram_size=3,
         #early_stopping=True
+        temperature=0.7,
+        top_k=50,
+        top_p=0.9,
+        do_sample=True
     )
 
     bot_response = tokenizer.decode(outputs[0], skip_special_tokens=False)
