@@ -41,14 +41,29 @@ function App() {
   // User registration
   const register = async () => {
     try {
-      const response = await axios.post('http://localhost:8000/register', { username, password });
+      const response = await axios.post(
+        'http://localhost:8000/register',
+        {
+          username: username.trim(),
+          password: password.trim(),
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      // Store the token in local storage
       localStorage.setItem('token', response.data.access_token);
       setIsAuthenticated(true);
       loadChatHistory();
     } catch (error) {
-      setError('Registration failed. Try again.');
+      console.error('Registration failed:', error);
+      setError('Registration failed. Please try again.');
     }
   };
+
 
   // User login
   const login = async () => {
