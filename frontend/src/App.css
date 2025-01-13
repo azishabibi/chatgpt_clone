@@ -29,18 +29,26 @@ body {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
+  box-sizing: border-box;
 }
 
 .auth-container h2 {
   margin-bottom: 20px;
 }
 
-.auth-container input {
+/* 确保所有输入框样式一致 */
+.auth-container input[type="text"],
+.auth-container input[type="password"] {
+  appearance: none;
+  -webkit-appearance: none;
   width: 100%;
-  padding: 10px;
+  padding: 12px 10px;
   margin-bottom: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  box-sizing: border-box;
+  font-size: 16px;
+  background-color: #ffffff;
 }
 
 .auth-container button {
