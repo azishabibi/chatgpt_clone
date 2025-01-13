@@ -9,15 +9,17 @@ body {
 .App {
   display: flex;
   height: 100vh;
-  flex-direction: row;/*?*/
+  flex-direction: row;
   background-color: #ffffff;
 }
+
 .main-container {
   display: flex;
   flex-grow: 1;
   flex-direction: row;
   background-color: #ffffff;
 }
+
 /* Authentication container */
 .auth-container {
   width: 300px;
@@ -60,20 +62,33 @@ body {
   margin-top: 10px;
 }
 
-.logout-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: #333;
-  color: white;
-  border: none;
+/* Header and Logout Button */
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  font-weight: bold;
   padding: 10px 15px;
-  border-radius: 5px;
+  border-bottom: 1px solid #ccc;
+  background-color: #f9f9f9;
+}
+
+.chat-header h1 {
+  margin: 0;
+  font-size: 18px;
+}
+
+
+/* Add styles for the underlined links */
+.link {
+  text-decoration: underline;
+  color: #333;
   cursor: pointer;
 }
 
-.logout-button:hover {
-  background-color: #555;
+.link:hover {
+  color: #555;
 }
 
 /* Sidebar Styles */
@@ -81,11 +96,10 @@ body {
   width: 20%;
   background-color: #f5f5f5;
   color: #333;
-  padding: 2px;
+  padding: 5px;
   display: flex;
   height: 100vh;
   flex-direction: column;
-  /*border-right: 1px solid #dcdcdc;*/
 }
 
 .sidebar h2 {
@@ -93,6 +107,12 @@ body {
   font-size: 20px;
   font-weight: bold;
   color: #444;
+  text-align: center;
+    display: flex;
+    align-items: center;
+    /* Vertically center the text */
+    justify-content: center;
+    margin: 0;
 }
 
 .chat-sessions-container {
@@ -101,10 +121,24 @@ body {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0px;
-  /* Adding some spacing between sessions */
-  padding-right: 0px;
-  /* Adding padding for better scroll visibility */
+  padding-right: 10px;
+}
+
+.chat-sessions-container input {
+  width: auto;
+  max-width: 150px;
+  min-width: 50px;
+  height: 18px;
+  padding: 0px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.chat-sessions-container input:focus {
+  outline: none;
+  border-color: #333;
 }
 
 .chat-sessions-container::-webkit-scrollbar {
@@ -128,28 +162,37 @@ body {
   box-sizing: border-box;
 }
 
-.sidebar div {
+/* -------------------------------------------------
+   专门用于「每一条聊天会话」的样式 
+   ------------------------------------------------- */
+.chat-session-item {
+  display: flex;
+  /* 关键：让内部左右排布 */
+  align-items: center;
+  justify-content: space-between;
   background-color: #f5f5f5;
   border-radius: 8px;
-  display: flex;
-  align-items: center;
-  padding: 0px;
-  width: 100%;
+  padding: 6px 10px;
+  /* 视自己需要调整内边距 */
+  margin-bottom: 0px;
+  /* 每条会话之间留一点空隙 */
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
-.sidebar div:hover {
+/* Hover效果：悬停变色 */
+.chat-session-item:hover {
   background-color: #e8e8e8;
 }
 
-.sidebar div.active-session {
+/* Active效果：当前选中的会话 */
+.chat-session-item.active-session {
   background-color: #e0e0e0;
   font-weight: bold;
 }
 
-.sidebar span {
-  flex-grow: 1;
+/* 标题文本 */
+.chat-session-item span {
   font-size: 14px;
   color: #333;
   text-overflow: ellipsis;
@@ -157,62 +200,70 @@ body {
   overflow: hidden;
 }
 
-.sidebar .delete-button {
+/* 删除按钮 */
+.chat-session-item .delete-button {
+  /* 将它“推”到最右侧 */
+  margin-left: auto;
+
   background-color: #333;
-  color: white;
+  color: #fff;
   border: none;
-  padding: 5px 10px;
+  padding: 5px 5px;
   border-radius: 5px;
   cursor: pointer;
   font-size: 12px;
-  margin-left: auto;
   transition: background-color 0.3s ease;
-  align-self: center;
 }
 
-.sidebar div:hover > .delete-button {
+/* 删除按钮的 Hover 效果 */
+.chat-session-item .delete-button:hover {
   background-color: #555;
 }
 
-button {
-  background-color: #333;
-  color: white;
-  border: none;
-  padding: 10px;
-  margin-top: 1px;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  
-}
-
-button:hover {
-  background-color: #555;
-}
 
 /* Chat Window Styles */
 .chat-window {
   width: 80%;
-  padding: 20px;
+  padding: 0px;
   background-color: #ffffff;
   display: flex;
   flex-direction: column;
-}
-
-.chat-window h1 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 20px;
+  height: 100vh;
 }
 
 .messages-container {
   flex-grow: 1;
   overflow-y: auto;
+  padding-left: 10px;
   padding-right: 10px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+.user-message {
+  align-self: flex-end;
+  /* 靠右对齐 */
+  background-color: #f5f5f5;
+  /* 浅绿色背景 */
+  color: #333;
+  padding: 10px 15px;
+  border-radius: 12px;
+  max-width: 60%;
+  word-wrap: break-word;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.bot-message {
+  align-self: flex-start;
+  /* 靠左对齐 */
+  background-color: #ffffff;
+  /* 浅灰色背景 */
+  color: #333;
+  padding: 10px 15px;
+  border-radius: 12px;
+  max-width: 90%;
+  word-wrap: break-word;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Code Block Styles */
@@ -231,17 +282,23 @@ button:hover {
 
 /* Input Area Styles */
 .input-area {
+  background-color: #ffffff;
   display: flex;
   gap: 10px;
-  margin-top: 20px;
+  margin-top: 0px;
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-bottom: 10px;
 }
 
 input[type="text"] {
   flex: 1;
-  padding: 10px;
+  padding: 5px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  font-size: 16px;
+  font-size: 14px;
+  background-color: #f5f5f5;
+  padding-left: 10px;
 }
 
 input[type="text"]:focus {
@@ -250,14 +307,15 @@ input[type="text"]:focus {
 }
 
 button {
-  background-color: #000;
+  background-color: #333;
   color: white;
   border: none;
-  padding: 10px 15px;
+  padding: 6px 6px;
   border-radius: 5px;
   cursor: pointer;
+
 }
 
 button:hover {
-  background-color: #333;
+  background-color: #555;
 }
