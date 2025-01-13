@@ -11,6 +11,7 @@ function Chat() {
     const [editingTitle, setEditingTitle] = useState(null);
     const [newTitle, setNewTitle] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
+    const [abortController, setAbortController] = useState(null);
     const navigate = useNavigate();
 
     const messagesEndRef = useRef(null);
@@ -125,6 +126,26 @@ function Chat() {
 
     // Send a message
     const sendMessage = async () => {
+        
+        if (isGenerating) {
+            try {
+                // Cancel the ongoing request
+                if (abortController) {
+                    abortController.abort();
+                    console.log('Aborted request.');
+                }
+
+                // Send the stop request to the backend
+                await axios.post('http://localhost:8000/stop_generation', {}, authHeader());
+                console.log('Stop generation request sent.');
+            } catch (error) {
+                console.error('Error stopping generation:', error);
+            } finally {
+                setIsGenerating(false);
+            }
+            return;
+        }
+        
         if (!input.trim()) return;
 
         let sessionId = currentChatSessionId;
@@ -137,12 +158,17 @@ function Chat() {
         setInput('');
         setIsGenerating(true);
         activeChatRef.current = sessionId;
-
+        // Create a new AbortController for the request
+        const controller = new AbortController();
+        setAbortController(controller);
         try {
             const response = await axios.post(
                 'http://localhost:8000/chat',
                 { chat_session_id: sessionId, message: input },
-                authHeader()
+                {
+                    ...authHeader(),
+                    signal: controller.signal, // Pass the abort signal
+                }
             );
 
             if (activeChatRef.current === sessionId) {
@@ -152,9 +178,14 @@ function Chat() {
                 ]);
             }
         } catch (error) {
-            console.error('Error sending message:', error);
+            if (axios.isCancel(error)) {
+                console.log('Message generation cancelled.');
+            } else {
+                console.error('Error sending message:', error);
+            }
         } finally {
             setIsGenerating(false);
+            setAbortController(null);
         }
     };
 
@@ -239,8 +270,8 @@ function Chat() {
                         onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
                         disabled={isGenerating}
                     />
-                    <button onClick={sendMessage} disabled={isGenerating}>
-                        {isGenerating ? 'Generating...' : 'Send'}
+                    <button onClick={sendMessage}>
+                        {isGenerating ? 'Stop' : 'Send'}
                     </button>
                 </div>
             </div>

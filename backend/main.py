@@ -1,5 +1,9 @@
 import torch
 import os
+import asyncio
+import threading
+from contextvars import ContextVar
+
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from fastapi import FastAPI, Request, HTTPException, Depends, status,Body
 from fastapi.security import OAuth2PasswordBearer
@@ -214,6 +218,7 @@ async def new_chat(request: Request, user: dict = Depends(get_current_user)):
     return {"chat_session_id": str(result.inserted_id)}
 
 # Send a message to a chat session
+generation_tasks = {}
 @app.post("/chat")
 async def chat(request: Request, user: dict = Depends(get_current_user)):
     data = await request.json()
@@ -235,31 +240,67 @@ async def chat(request: Request, user: dict = Depends(get_current_user)):
         {"$push": {"messages": user_message}}
     )
 
-    # Generate a response using the model
+    task = asyncio.create_task(generate_response(message, chat_session_id, user["username"]))
+
+    # 存储用户的生成任务
+    generation_tasks[user["username"]] = task
+
+    # 等待任务完成
+    try:
+        response = await task
+    except asyncio.CancelledError:
+        return {"response": "Generation stopped."}
+
+    return {"response": response}
+# 生成模型回复的异步任务
+async def generate_response(message, chat_session_id, username):
+    # Convert input to tensor
     inputs = tokenizer(message, return_tensors="pt").to(device)
-    outputs = model.generate(
-        **inputs,
-        max_length=200,
-        eos_token_id=tokenizer.eos_token_id,
-        pad_token_id=tokenizer.pad_token_id,
-        repetition_penalty=1.2,
-        no_repeat_ngram_size=3,
-        temperature=0.7,
-        top_k=50,
-        top_p=0.9,
-        do_sample=True
-    )
 
-    bot_response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    try:
+        # Generate the model's response
+        outputs = model.generate(
+            **inputs,
+            max_length=200,
+            eos_token_id=tokenizer.eos_token_id,
+            pad_token_id=tokenizer.pad_token_id,
+            repetition_penalty=1.2,
+            no_repeat_ngram_size=3,
+            temperature=0.7,
+            top_k=50,
+            top_p=0.9,
+            do_sample=True
+        )
 
-    # Add the bot's response to the session
-    bot_message = {"sender": "Chatbot", "content": bot_response}
-    await db.chat_sessions.update_one(
-        {"_id": ObjectId(chat_session_id)},
-        {"$push": {"messages": bot_message}}
-    )
+        # Decode the generated text
+        bot_response = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-    return {"response": bot_response}
+        # Add the bot's response to the session
+        bot_message = {"sender": "Chatbot", "content": bot_response}
+        await db.chat_sessions.update_one(
+            {"_id": ObjectId(chat_session_id)},
+            {"$push": {"messages": bot_message}}
+        )
+
+        return bot_response
+
+    except asyncio.CancelledError:
+        # Handle task cancellation
+        print("Generation task was cancelled.")
+        raise
+
+@app.post("/stop_generation")
+async def stop_generation(user: dict = Depends(get_current_user)):
+    # 获取当前用户的生成任务
+    task = generation_tasks.get(user["username"])
+
+    if not task:
+        return {"message": "No active generation task found."}
+
+    # 取消任务
+    task.cancel()
+    return {"message": "Generation stopped."}
+
 
 # Get chat history for the current user
 @app.get("/chat_history")
