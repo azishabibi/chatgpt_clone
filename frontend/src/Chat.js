@@ -7,6 +7,7 @@ function Chat() {
     const [chatSessions, setChatSessions] = useState([]);
     const [currentChatSessionId, setCurrentChatSessionId] = useState(null);
     const [messages, setMessages] = useState([]);
+    const [editingMessageIndex, setEditingMessageIndex] = useState(null);
     const [input, setInput] = useState('');
     const [editingTitle, setEditingTitle] = useState(null);
     const [newTitle, setNewTitle] = useState('');
@@ -188,6 +189,53 @@ function Chat() {
             setAbortController(null);
         }
     };
+    // Handle editing a message
+    const handleEditMessage = async (index) => {
+        const updatedMessages = [...messages];
+        const editedMessage = updatedMessages[index].content;
+
+        if (!editedMessage.trim()) return;
+        updatedMessages[index + 1] = { sender: 'Chatbot', content: '' }; 
+        setMessages((prevMessages) => [
+            ...prevMessages.slice(0, index),
+            { sender: 'You', content: editedMessage },
+            ...prevMessages.slice(index + 1),
+        ]);
+
+        setIsGenerating(true);
+        activeChatRef.current = currentChatSessionId;
+
+        const controller = new AbortController();
+        setAbortController(controller);
+
+        try {
+            const response = await axios.post(
+                'http://localhost:8000/chat',
+                {
+                    chat_session_id: currentChatSessionId,
+                    message: editedMessage,
+                },
+                {
+                    ...authHeader(),
+                    signal: controller.signal,
+                }
+            );
+
+            if (activeChatRef.current === currentChatSessionId) {
+                updatedMessages[index + 1] = { sender: 'Chatbot', content: response.data.response };
+                setMessages(updatedMessages);
+            }
+        } catch (error) {
+            if (axios.isCancel(error)) {
+                console.log('Message generation cancelled.');
+            } else {
+                console.error('Error editing message:', error);
+            }
+        } finally {
+            setIsGenerating(false);
+            setAbortController(null);
+        }
+    };
 
     return (
         <div className="main-container">
@@ -251,9 +299,34 @@ function Chat() {
                         <div
                             key={index}
                             className={msg.sender === 'You' ? 'user-message' : 'bot-message'}
+                            onDoubleClick={() => msg.sender === 'You' && setEditingMessageIndex(index)}
                         >
-                            {msg.content}
+                            {editingMessageIndex === index ? (
+                                <input
+                                    type="text"
+                                    value={messages[index].content}
+                                    onChange={(e) => {
+                                        const updatedMessages = [...messages];
+                                        updatedMessages[index].content = e.target.value;
+                                        setMessages(updatedMessages);
+                                    }}
+                                    onBlur={() => {
+                                        handleEditMessage(index);
+                                        setEditingMessageIndex(null);
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            handleEditMessage(index);
+                                            setEditingMessageIndex(null);
+                                        }
+                                    }}
+                                    autoFocus
+                                />
+                            ) : (
+                                msg.content
+                            )}
                         </div>
+
                     ))}
                     <div ref={messagesEndRef} />
                 </div>
