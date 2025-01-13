@@ -1,2 +1,2 @@
-swe bench
-loftq
+docker-compose up --build
+

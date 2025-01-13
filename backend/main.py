@@ -1,8 +1,6 @@
 import torch
 import os
 import asyncio
-import threading
-from contextvars import ContextVar
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from fastapi import FastAPI, Request, HTTPException, Depends, status,Body
